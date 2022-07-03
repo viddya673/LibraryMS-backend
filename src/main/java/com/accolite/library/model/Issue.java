@@ -1,10 +1,11 @@
 package com.accolite.library.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import javax.persistence.*;
-import java.util.Date;
-import java.util.List;
+import java.time.LocalDate;
 
 @EnableJpaRepositories
 @Entity
@@ -13,16 +14,16 @@ public class Issue {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int iid;
+    private LocalDate issueDate;
+    private LocalDate dueDate;
+    private LocalDate returnDate;
 
-    private Date issueDate;
-    private Date dueDate;
-
-    private Date returnDate;
-
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "book_id")
     private Books books;
@@ -35,27 +36,27 @@ public class Issue {
         this.iid = iid;
     }
 
-    public Date getIssueDate() {
+    public LocalDate getIssueDate() {
         return issueDate;
     }
 
-    public void setIssueDate(Date issueDate) {
+    public void setIssueDate(LocalDate issueDate) {
         this.issueDate = issueDate;
     }
 
-    public Date getDueDate() {
+    public LocalDate getDueDate() {
         return dueDate;
     }
 
-    public void setDueDate(Date dueDate) {
+    public void setDueDate(LocalDate dueDate) {
         this.dueDate = dueDate;
     }
 
-    public Date getReturnDate() {
+    public LocalDate getReturnDate() {
         return returnDate;
     }
 
-    public void setReturnDate(Date returnDate) {
+    public void setReturnDate(LocalDate returnDate) {
         this.returnDate = returnDate;
     }
 
@@ -78,7 +79,7 @@ public class Issue {
     public Issue() {
     }
 
-    public Issue(int iid, Date issueDate, Date dueDate, Date returnDate, User user, Books books) {
+    public Issue(int iid, LocalDate issueDate, LocalDate dueDate, LocalDate returnDate, User user, Books books) {
         this.iid = iid;
         this.issueDate = issueDate;
         this.dueDate = dueDate;

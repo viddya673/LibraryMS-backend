@@ -1,18 +1,18 @@
 package com.accolite.library.service;
 
 import com.accolite.library.model.Books;
+import com.accolite.library.model.Issue;
 import com.accolite.library.model.Role;
 import com.accolite.library.model.User;
+import com.accolite.library.repository.BooksRepository;
+import com.accolite.library.repository.IssueRepository;
 import com.accolite.library.repository.RoleRepository;
 import com.accolite.library.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.time.LocalDate;
+import java.util.*;
 
 @Service
 public class UserService {
@@ -21,6 +21,12 @@ public class UserService {
 
     @Autowired
     private RoleRepository rrepo;
+
+    @Autowired
+    private BooksRepository brepo;
+
+    @Autowired
+    private IssueRepository irepo;
 
     public List<User> getAllUsers(){
         Optional<Role> orole = rrepo.findById(3);
@@ -38,42 +44,152 @@ public class UserService {
         urepo.save(user);
     }
 
-    public void createAdmin(User user) throws Exception {
-        if(user.getFullname() == null || user.getEmail() == null){
-            throw new Exception();
-        }
-        Optional<Role> role = rrepo.findById(2);
-        Role newRole = role.get();
-        user.setRole(newRole);
-        urepo.save(user);
-    }
-
-
-    public String changePassword(String fullname, String oldPassword, String newPassword){
-        Optional<User> user = urepo.findByFullname(fullname);
+    public User changePassword(int uid, String oldPassword, String newPassword){
+        Optional<User> user = urepo.findById(uid);
         if(!user.isPresent()){
-            return "User not found";
+            return null;
         }
         else if(!Objects.equals(user.get().getPassword(), oldPassword)){
-            return "Invalid credentials";
+            return null;
         }
 
         User updated = user.get();
         updated.setPassword(newPassword);
         urepo.save(updated);
-        return "Password updated";
+        return updated;
     }
 
-    public String deleteUser(User user){
+    public User changePasswordByAdmin(int uid, String newPassword){
+        User user = urepo.findById(uid).get();
+        user.setPassword(newPassword);
+        urepo.save(user);
+        return user;
+    }
+
+    public User userLogin(String email, String pass){
+        Optional<User> user = urepo.findByEmail(email);
+        User data = user.get();
+        if(data.getPassword().equals(pass)){
+            return data;
+        }
+        return null;
+    }
+
+    public User deleteUser(User user){
         Role role = user.getRole();
         if(role.getRid() == 1){
-            return "Invalid request";
+            return null;
         }
         Optional<Role> newRole = rrepo.findById(4);
         Role newRole1 = newRole.get();
         user.setRole(newRole1);
         urepo.save(user);
-        return "User deleted successfully";
+        return user;
+    }
+
+    public List<Books> getAllBooks() {
+        return brepo.findAll();
+    }
+
+    public List<Books> getAvailableBooks() {
+        List<Books> allBooks = brepo.findAll();
+        List<Books> availBooks = new ArrayList<Books>();
+        for(Books book: allBooks){
+            if(book.getNoOfCopies() != 0){
+                availBooks.add(book);
+            }
+        }
+        return availBooks;
+    }
+
+    public void addBook(Books book){
+        brepo.save(book);
+    }
+
+    public void removeBook(int bid) {
+        Optional<Books> book = brepo.findById(bid);
+        Books book1 = book.get();
+        brepo.delete(book1);
+    }
+
+    public Issue issueBook(int uid, int bid){
+
+        Issue issue = new Issue();
+
+        User user = urepo.findById(uid).get();
+
+        Books book = brepo.findById(bid).get();
+        if(book.getNoOfCopies() == 0){
+            return null;
+        }
+
+        LocalDate issueDate = LocalDate.now();
+        LocalDate dueDate = LocalDate.parse(issueDate.toString()).plusDays(7);
+
+        book.setNoOfCopies(book.getNoOfCopies()-1);
+
+        Random rand = new Random();
+        issue.setIid(rand.nextInt(2000));
+
+        issue.setUser(user);
+        issue.setBooks(book);
+        issue.setIssueDate(issueDate);
+        issue.setDueDate(dueDate);
+        issue.setReturnDate(null);
+
+        Issue response = irepo.save(issue);
+        return response;
+    }
+    public User usersByIssue(int bid){
+        Optional<Issue> issue = irepo.findByBooks(brepo.findById(bid).get());
+        User user = issue.get().getUser();
+        return user;
+    }
+
+    public List<User> overdueUsers(){
+        List<User> overdueUsers = new ArrayList<>();
+        List<Issue> issues = irepo.findAll();
+        for(Issue issue: issues){
+            if(LocalDate.now().isAfter(issue.getDueDate())){
+                overdueUsers.add(issue.getUser());
+            }
+        }
+        System.out.println(overdueUsers);
+        return overdueUsers;
+    }
+
+    public Issue returnBook(int iid){
+        Optional<Issue> data =irepo.findById(iid);
+        if(data.get().getReturnDate() == null){
+            System.out.println(data.get().getReturnDate());
+            return null;
+        }
+        LocalDate returnDate = LocalDate.now();
+        data.get().setReturnDate(returnDate);
+        Optional<Books> bookToBeReturned = brepo.findById(data.get().getBooks().getBid());
+        bookToBeReturned.get().setNoOfCopies(bookToBeReturned.get().getNoOfCopies()+1);
+
+        brepo.save(bookToBeReturned.get());
+        irepo.save(data.get());
+        return data.get();
+    }
+
+    public List<Issue> getBooksBorrowed(int uid){
+
+        User user = urepo.findById(uid).get();
+        return irepo.findAllByUser(user);
+    }
+
+    public List<Issue> overdueByUser(int uid){
+        List<Issue> overdues = new ArrayList<>();
+        User user = urepo.findById(uid).get();
+        List<Issue> issues = irepo.findAllByUser(user);
+        for(Issue issue: issues){
+            if(LocalDate.now().isAfter(issue.getDueDate())){
+                overdues.add(issue);
+            }
+        }
+        return overdues;
     }
 
 }

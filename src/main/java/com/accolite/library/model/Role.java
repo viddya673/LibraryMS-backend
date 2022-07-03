@@ -36,15 +36,13 @@ public class Role {
     public Role(int rid, String role) {
         this.rid = rid;
         this.role = role;
-        //this.user = user;
     }
 
-    @Override
-    public String toString() {
-        return "Role{" +
-                "rid=" + rid +
-                ", role='" + role + '\'' +
-                //", user=" + user +
-                '}';
-    }
+//    @Override
+//    public String toString() {
+//        return "Role{" +
+//                "rid=" + rid +
+//                ", role='" + role + '\'' +
+//                '}';
+//    }
 }

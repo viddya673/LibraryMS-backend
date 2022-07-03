@@ -1,11 +1,13 @@
 package com.accolite.library.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import javax.persistence.*;
 import java.util.List;
 import java.util.Set;
+
 
 @EnableJpaRepositories
 @Entity
@@ -18,21 +20,11 @@ public class User {
     private String email;
     private String password;
 
-    @JsonIgnore
+
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id")
     private Role role;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Issue> issues;
-
-    public List<Issue> getIssues() {
-        return issues;
-    }
-
-    public void setIssues(List<Issue> issues) {
-        this.issues = issues;
-    }
 
     public int getUid() {
         return uid;
@@ -77,13 +69,12 @@ public class User {
     public User() {
     }
 
-    public User(int uid, String fullname, String email, String password, Role role, List<Issue> issues) {
+    public User(int uid, String fullname, String email, String password, Role role) {
         this.uid = uid;
         this.fullname = fullname;
         this.email = email;
         this.password = password;
         this.role = role;
-        this.issues = issues;
     }
 
     @Override
@@ -93,8 +84,7 @@ public class User {
                 ", fullname='" + fullname + '\'' +
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
-                ", role_id=" + role.getRid() +
-                ", issues=" + issues +
+                ", role=" + role +
                 '}';
     }
 }

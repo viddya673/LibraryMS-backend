@@ -18,16 +18,6 @@ public class Books {
     private String publisher;
     private int noOfCopies;
 
-    @OneToMany(mappedBy = "books", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Issue> issues;
-
-    public List<Issue> getIssues() {
-        return issues;
-    }
-
-    public void setIssues(List<Issue> issues) {
-        this.issues = issues;
-    }
 
     public int getBid() {
         return bid;
@@ -72,24 +62,22 @@ public class Books {
     public Books() {
     }
 
-    public Books(int bid, String bname, String author, String publisher, int noOfCopies, List<Issue> issues) {
+    public Books(int bid, String bname, String author, String publisher, int noOfCopies) {
         this.bid = bid;
         this.bname = bname;
         this.author = author;
         this.publisher = publisher;
         this.noOfCopies = noOfCopies;
-        this.issues = issues;
     }
 
-    @Override
-    public String toString() {
-        return "Books{" +
-                "bid=" + bid +
-                ", bname='" + bname + '\'' +
-                ", author='" + author + '\'' +
-                ", publisher='" + publisher + '\'' +
-                ", noOfCopies=" + noOfCopies +
-                ", issues=" + issues +
-                '}';
-    }
+//    @Override
+//    public String toString() {
+//        return "Books{" +
+//                "bid=" + bid +
+//                ", bname='" + bname + '\'' +
+//                ", author='" + author + '\'' +
+//                ", publisher='" + publisher + '\'' +
+//                ", noOfCopies=" + noOfCopies +
+//                '}';
+//    }
 }
