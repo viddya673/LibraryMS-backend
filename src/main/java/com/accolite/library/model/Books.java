@@ -70,14 +70,14 @@ public class Books {
         this.noOfCopies = noOfCopies;
     }
 
-//    @Override
-//    public String toString() {
-//        return "Books{" +
-//                "bid=" + bid +
-//                ", bname='" + bname + '\'' +
-//                ", author='" + author + '\'' +
-//                ", publisher='" + publisher + '\'' +
-//                ", noOfCopies=" + noOfCopies +
-//                '}';
-//    }
+    @Override
+    public String toString() {
+        return "Books{" +
+                "bid=" + bid +
+                ", bname='" + bname + '\'' +
+                ", author='" + author + '\'' +
+                ", publisher='" + publisher + '\'' +
+                ", noOfCopies=" + noOfCopies +
+                '}';
+    }
 }

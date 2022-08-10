@@ -38,11 +38,11 @@ public class Role {
         this.role = role;
     }
 
-//    @Override
-//    public String toString() {
-//        return "Role{" +
-//                "rid=" + rid +
-//                ", role='" + role + '\'' +
-//                '}';
-//    }
+    @Override
+    public String toString() {
+        return "Role{" +
+                "rid=" + rid +
+                ", role='" + role + '\'' +
+                '}';
+    }
 }

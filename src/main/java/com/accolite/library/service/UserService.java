@@ -160,7 +160,7 @@ public class UserService {
 
     public Issue returnBook(int iid){
         Optional<Issue> data =irepo.findById(iid);
-        if(data.get().getReturnDate() == null){
+        if(data.get().getReturnDate() != null){
             System.out.println(data.get().getReturnDate());
             return null;
         }
@@ -185,11 +185,22 @@ public class UserService {
         User user = urepo.findById(uid).get();
         List<Issue> issues = irepo.findAllByUser(user);
         for(Issue issue: issues){
-            if(LocalDate.now().isAfter(issue.getDueDate())){
+            if(LocalDate.now().isAfter(issue.getDueDate()) && (issue.getReturnDate() == null)){
                 overdues.add(issue);
             }
         }
         return overdues;
     }
 
+    public List<User> getUserByBook(int bid){
+        List<Issue> issues = irepo.findAll();
+        Books book = brepo.findById(bid).get();
+        List<User> users = new ArrayList<>();
+        for(Issue issue: issues) {
+            if (issue.getBooks() == book && (issue.getReturnDate() == null)) {
+                users.add(issue.getUser());
+            }
+        }
+        return users;
+    }
 }

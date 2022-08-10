@@ -72,8 +72,8 @@ public class UserController {
 
     @PutMapping(value = "update/password/{uid}")
     //update/password//?email=viddya@gmail.com&name=Viddya
-    public ResponseEntity<User> changePassword(@PathVariable("uid") int uid, @RequestParam("oldPass") String oldPassword, @RequestParam("newPass") String newPassword){
-        User user = uservice.changePassword(uid, oldPassword, newPassword);
+    public ResponseEntity<User> changePassword(@PathVariable("uid") int uid, @RequestBody changePassword change){
+        User user = uservice.changePassword(uid, change.oldPassword, change.newPassword);
         return new ResponseEntity<User>(user, HttpStatus.OK);
     }
 
@@ -142,4 +142,9 @@ public class UserController {
         return new ResponseEntity<List<Issue>>(response, HttpStatus.OK);
     }
 
+    @GetMapping("/users-by-book/{bid}")
+    public ResponseEntity<List<User>> getUsersByBook(@PathVariable("bid") int bid){
+//        List<User> users = ;
+        return new ResponseEntity<List<User>>(uservice.getUserByBook(bid), HttpStatus.OK);
+    }
 }
